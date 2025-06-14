@@ -3,26 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Roller</title>
+    <title>Polyhedral Dice Roller</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
     <header>
-        <h1>Dice Roller</h1>
+        <h1>Polyhedral Dice Roller</h1>
     </header>
     <main>
-        <div class="dice-container" aria-label="Dice face">
-            <div class="dice" id="dice">
+        <div class="roller-container">
+            <fieldset class="control-group">
+                <legend>Quick Rolls</legend>
+                <div class="quick-rolls" id="quickRollsContainer">
+                    <button type="button" class="dice-button" data-sides="4">d4</button>
+                    <button type="button" class="dice-button" data-sides="6">d6</button>
+                    <button type="button" class="dice-button" data-sides="8">d8</button>
+                    <button type="button" class="dice-button" data-sides="10">d10</button>
+                    <button type="button" class="dice-button" data-sides="12">d12</button>
+                    <button type="button" class="dice-button" data-sides="20">d20</button>
+                    <button type="button" class="dice-button" data-sides="100">d100</button>
                 </div>
+            </fieldset>
+            
+            <fieldset class="control-group">
+                <legend>Custom Roll</legend>
+                <form id="customRollForm" class="custom-roll-form">
+                    <div class="form-row">
+                        <label for="numDice">Dice</label>
+                        <input type="number" id="numDice" value="1" min="1" max="100" required>
+                    </div>
+                    <span class="form-separator">d</span>
+                    <div class="form-row">
+                        <label for="numSides">Sides</label>
+                        <input type="number" id="numSides" min="2" max="1000" required>
+                    </div>
+                    <span class="form-separator">+</span>
+                    <div class="form-row">
+                        <label for="modifier">Modifier</label>
+                        <input type="number" id="modifier" value="0" min="-100" max="100" required>
+                    </div>
+                    <button type="submit" class="roll-button">Roll</button>
+                </form>
+            </fieldset>
         </div>
-        <div class="controls">
-            <button id="rollButton" type="button" aria-controls="dice result">Roll the Dice</button>
-            <p id="result" class="result" aria-live="polite">Roll to see the result</p>
+        
+        <div class="results-container" aria-live="polite">
+            <h2>Result</h2>
+            <div id="results" class="results-output">
+                <p>Your roll results will appear here.</p>
+            </div>
         </div>
     </main>
     <footer>
-        <p>&copy; 2025 Your Name. All rights reserved.</p>
+        <p>Built for efficiency and clarity.</p>
     </footer>
 </body>
 </html>
