@@ -107,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateSelectionState();
         } else {
-            // Revert to old text if invalid
             alert(`"${newExpression}" is not a valid roll. Reverting.`);
             button.textContent = savedRolls[index];
         }
@@ -127,16 +126,21 @@ document.addEventListener('DOMContentLoaded', () => {
         newButton.classList.add('editing');
         newButton.contentEditable = 'true';
         newButton.focus();
-        document.execCommand('selectAll', false, null); // Select all text
+
+        // *** THIS IS THE FIX ***
+        // Use the modern Selection API instead of the deprecated execCommand
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(newButton);
+        selection.removeAllRanges(); // Clear any existing selections
+        selection.addRange(range);   // Add the new range
     });
 
     customRollsContainer.addEventListener('click', (e) => {
-        // --- Handle Deleting a button ---
         if (e.target.matches('.delete-custom-roll-btn')) {
             const indexToDelete = parseInt(e.target.dataset.index, 10);
             savedRolls.splice(indexToDelete, 1);
             saveRollsToStorage();
-            // If the deleted roll was the selected one, clear selection
             if (selectedRoll && selectedRoll.index === indexToDelete) {
                 selectedRoll = null;
             }
@@ -144,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // --- Handle Selecting a button ---
         if (e.target.matches('.custom-roll-btn')) {
             const button = e.target;
             const index = parseInt(button.dataset.index, 10);
@@ -153,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Handle Editing a button ---
     customRollsContainer.addEventListener('dblclick', (e) => {
         if (e.target.matches('.custom-roll-btn')) {
             const button = e.target;
@@ -165,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     customRollsContainer.addEventListener('keydown', (e) => {
         if (e.target.matches('.custom-roll-btn') && e.key === 'Enter') {
-            e.preventDefault(); // Prevent new line in contentEditable
+            e.preventDefault();
             const button = e.target;
             const index = parseInt(button.dataset.index, 10);
             finishEditing(button, index);
@@ -178,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = parseInt(button.dataset.index, 10);
             finishEditing(button, index);
         }
-    }, true); // Use capture phase to catch blur event reliably
+    }, true);
 
     executeRollBtn.addEventListener('click', () => {
         if (selectedRoll) {
