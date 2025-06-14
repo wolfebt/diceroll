@@ -1,0 +1,125 @@
+/* Modern CSS Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg-color: #f0f2f5;
+    --text-color: #1c1e21;
+    --primary-color: #0866ff;
+    --primary-hover-color: #0652cc;
+    --dice-bg: #ffffff;
+    --dot-color: #1c1e21;
+    --border-radius: 8px;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header, footer {
+    text-align: center;
+    padding: 1rem;
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.dice-container {
+    perspective: 1000px; /* For 3D animations */
+}
+
+.dice {
+    width: 100px;
+    height: 100px;
+    background-color: var(--dice-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: grid;
+    padding: 0.5rem;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Dice face patterns using CSS Grid */
+.dice[data-face="1"] { grid-template-areas: ". . ." ". a ." ". . ."; }
+.dice[data-face="2"] { grid-template-areas: "a . ." ". . ." ". . b"; }
+.dice[data-face="3"] { grid-template-areas: "a . ." ". b ." ". . c"; }
+.dice[data-face="4"] { grid-template-areas: "a . b" ". . ." "c . d"; }
+.dice[data-face="5"] { grid-template-areas: "a . b" ". c ." "d . e"; }
+.dice[data-face="6"] { grid-template-areas: "a . b" "c . d" "e . f"; }
+
+.dot {
+    width: 20px;
+    height: 20px;
+    background-color: var(--dot-color);
+    border-radius: 50%;
+    align-self: center;
+    justify-self: center;
+}
+
+/* Assign dots to grid areas */
+.dot:nth-child(1) { grid-area: a; }
+.dot:nth-child(2) { grid-area: b; }
+.dot:nth-child(3) { grid-area: c; }
+.dot:nth-child(4) { grid-area: d; }
+.dot:nth-child(5) { grid-area: e; }
+.dot:nth-child(6) { grid-area: f; }
+
+
+.controls {
+    text-align: center;
+}
+
+#rollButton {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#rollButton:hover,
+#rollButton:focus-visible {
+    background-color: var(--primary-hover-color);
+    outline: 2px solid var(--primary-hover-color);
+    outline-offset: 2px;
+}
+
+.result {
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    min-height: 1.25em; /* Prevents layout shift */
+}
+
+/* Animation for the dice roll */
+@keyframes roll {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    100% { transform: rotateX(720deg) rotateY(720deg); }
+}
+
+.dice.rolling {
+    animation: roll 0.7s ease-out;
+}
