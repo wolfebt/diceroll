@@ -98,11 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
         button.contentEditable = 'false';
         button.classList.remove('editing');
         const newExpression = button.textContent.trim();
-        
+
         if (parseExpression(newExpression)) {
             savedRolls[index] = newExpression;
             saveRollsToStorage();
-            if(selectedRoll && selectedRoll.index === index) {
+            if (selectedRoll && selectedRoll.index === index) {
                 selectedRoll.expression = newExpression;
             }
             updateSelectionState();
@@ -111,29 +111,48 @@ document.addEventListener('DOMContentLoaded', () => {
             button.textContent = savedRolls[index];
         }
     };
-    
+
     // --- Event Handlers ---
+
+    // *** THIS IS THE REWRITTEN, ROBUST FUNCTION ***
     addNewRollBtn.addEventListener('click', () => {
         const newRollExpression = '1d6';
+        const newIndex = savedRolls.length;
+
+        // 1. Update the data array and save it
         savedRolls.push(newRollExpression);
         saveRollsToStorage();
-        renderCustomRolls();
 
-        const newButtonIndex = savedRolls.length - 1;
-        const newButton = customRollsContainer.querySelector(`.custom-roll-btn[data-index="${newButtonIndex}"]`);
-        
-        // Enter edit mode for the new button immediately
-        newButton.classList.add('editing');
-        newButton.contentEditable = 'true';
+        // 2. Create the new button elements directly
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-roll-wrapper';
+
+        const newButton = document.createElement('button');
+        newButton.type = 'button';
+        newButton.className = 'custom-roll-btn editing'; // Add 'editing' class immediately
+        newButton.dataset.index = newIndex;
+        newButton.textContent = newRollExpression;
+        newButton.contentEditable = 'true'; // Set editable immediately
+
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-custom-roll-btn';
+        deleteButton.dataset.index = newIndex;
+        deleteButton.setAttribute('aria-label', `Delete roll ${newRollExpression}`);
+        deleteButton.innerHTML = '&times;';
+
+        wrapper.appendChild(newButton);
+        wrapper.appendChild(deleteButton);
+
+        // 3. Append the new wrapper to the container
+        customRollsContainer.appendChild(wrapper);
+
+        // 4. Focus the new button and select its text
         newButton.focus();
-
-        // *** THIS IS THE FIX ***
-        // Use the modern Selection API instead of the deprecated execCommand
         const selection = window.getSelection();
         const range = document.createRange();
         range.selectNodeContents(newButton);
-        selection.removeAllRanges(); // Clear any existing selections
-        selection.addRange(range);   // Add the new range
+        selection.removeAllRanges();
+        selection.addRange(range);
     });
 
     customRollsContainer.addEventListener('click', (e) => {
@@ -144,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedRoll && selectedRoll.index === indexToDelete) {
                 selectedRoll = null;
             }
+            // Re-render the whole list on delete to fix indices
             renderCustomRolls();
             return;
         }
@@ -185,12 +205,12 @@ document.addEventListener('DOMContentLoaded', () => {
     executeRollBtn.addEventListener('click', () => {
         if (selectedRoll) {
             const rollData = parseExpression(selectedRoll.expression);
-            if(rollData) {
+            if (rollData) {
                 createRoll(rollData, selectedRoll.expression);
             }
         }
     });
-    
+
     quickRollsContainer.addEventListener('click', (e) => {
         if (e.target.matches('.dice-button')) {
             const sides = parseInt(e.target.dataset.sides, 10);
