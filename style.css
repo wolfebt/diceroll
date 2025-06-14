@@ -1,112 +1,109 @@
 /* (Keep all previous CSS from the last step) */
 /* ... */
 
-/* ADDED AND MODIFIED STYLES FOR THIS VERSION */
+/* --- ADDED AND MODIFIED STYLES FOR THIS VERSION --- */
 
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-}
-
-.new-roll-form {
+.my-rolls-controls {
     display: flex;
-    gap: 0.5rem;
+    justify-content: center;
     margin-bottom: 1.5rem;
 }
 
-.new-roll-form input[type="text"] {
-    flex-grow: 1;
-    padding: 0.75rem;
-    font-family: inherit;
-    font-size: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-}
-
-.new-roll-form button {
+.add-button {
     font-family: inherit;
     font-size: 1rem;
     font-weight: 600;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 1.5rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    background-color: #e9ecef;
+    background-color: #28a745; /* Green for "Add" */
+    color: white;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-    white-space: nowrap;
+    transition: background-color 0.2s;
 }
 
-.new-roll-form button:hover {
-    border-color: var(--primary-color);
-    background-color: #dde2e6;
+.add-button:hover {
+    background-color: #218838;
 }
 
-.custom-rolls-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+.custom-rolls-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
 }
 
-.custom-roll-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.custom-roll-wrapper {
+    position: relative;
 }
 
-.custom-roll-item input[type="radio"] {
-    /* Hide the default radio button */
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.custom-roll-item label {
-    flex-grow: 1;
-    display: block;
-    padding: 1rem;
+.custom-roll-btn {
+    width: 100%;
+    padding: 1rem 2rem 1rem 1rem; /* Extra padding on right for delete button */
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
     background-color: var(--surface-color);
-    text-align: center;
-    font-size: 1.1rem;
-    font-weight: 500;
     cursor: pointer;
     transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
-/* Style for the label when its associated radio is checked */
-.custom-roll-item input[type="radio"]:checked + label {
+.custom-roll-btn.selected {
     border-color: var(--primary-color);
     background-color: #e7f1ff;
     box-shadow: 0 0 0 2px var(--primary-color);
 }
 
-.custom-roll-item input[type="radio"]:focus-visible + label {
+.custom-roll-btn.editing {
+    border-color: #ffc107; /* Yellow to indicate editing */
+    background-color: #fff3cd;
+    cursor: text;
+}
+
+.custom-roll-btn:focus-visible {
     outline: 3px solid var(--primary-hover);
     outline-offset: 2px;
 }
 
-.delete-roll-button {
-    padding: 0.5rem;
-    background: none;
+.delete-custom-roll-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: #6c757d;
+    color: white;
     border: none;
+    border-radius: 50%;
     cursor: pointer;
-    color: #6c757d;
-    font-size: 1.5rem;
-    line-height: 1;
+    font-size: 1rem;
+    line-height: 24px;
+    text-align: center;
+    opacity: 0.5;
+    transition: opacity 0.2s, background-color 0.2s;
 }
 
-.delete-roll-button:hover {
-    color: #dc3545; /* Red for delete action */
+.custom-roll-wrapper:hover .delete-custom-roll-btn {
+    opacity: 1;
+}
+
+.delete-custom-roll-btn:hover {
+    background-color: #dc3545; /* Red for delete action */
+}
+
+/* --- MAIN ACTION AREA --- */
+
+.action-results-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 1rem; /* Align with main content padding */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .roll-button-large {
@@ -119,15 +116,33 @@
     border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.roll-button-large:hover,
-.roll-button-large:focus-visible {
-    background-color: var(--primary-hover);
+    transition: background-color 0.2s, opacity 0.2s;
 }
 
 .roll-button-large:disabled {
     background-color: #6c757d;
     cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.results-container {
+    width: 100%;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    min-height: 100px; /* Give it some initial size */
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }

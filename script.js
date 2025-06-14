@@ -1,30 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Element References ---
     const quickRollsContainer = document.getElementById('quickRollsContainer');
-    const newRollCreatorForm = document.getElementById('newRollCreatorForm');
-    const newRollExpressionInput = document.getElementById('newRollExpression');
-    const customRollsList = document.getElementById('customRollsList');
-    const executeRollButton = document.getElementById('executeRollButton');
+    const addNewRollBtn = document.getElementById('addNewRollBtn');
+    const customRollsContainer = document.getElementById('customRollsContainer');
+    const executeRollBtn = document.getElementById('executeRollBtn');
     const resultsDiv = document.getElementById('results');
 
     // --- State Management ---
-    let savedRolls = JSON.parse(localStorage.getItem('diceRoller-savedRolls')) || [];
+    let savedRolls = JSON.parse(localStorage.getItem('diceRoller-savedRollsV2')) || ['2d6+3', '1d20-1'];
+    let selectedRoll = null;
 
     // --- Core Functions ---
-
-    /**
-     * Parses a dice expression string (e.g., "2d6+3", "d20-1", "3d8") into an object.
-     * @param {string} expression - The dice string to parse.
-     * @returns {object|null} An object with {numDice, numSides, modifier} or null if invalid.
-     */
     const parseExpression = (expression) => {
         const pattern = /^(?:(\d+))?d(\d+)(?:([+-])(\d+))?$/i;
         const match = expression.replace(/\s+/g, '').match(pattern);
-
         if (!match) return null;
-
         const [, numDiceStr, numSidesStr, sign, modifierStr] = match;
-        
         return {
             numDice: parseInt(numDiceStr || '1', 10),
             numSides: parseInt(numSidesStr, 10),
@@ -32,22 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
-    /**
-     * Generates a random integer between 1 and the number of sides.
-     */
     const rollSingleDie = (sides) => Math.floor(Math.random() * sides) + 1;
 
-    /**
-     * Executes a roll based on parsed expression components.
-     */
     const createRoll = (rollData, expression) => {
         const { numDice, numSides, modifier } = rollData;
-
         if (numDice <= 0 || numSides <= 1 || numDice > 100 || numSides > 1000) {
             displayResult({ error: "Invalid dice parameters. Check your expression." });
             return;
         }
-
         const rolls = [];
         let total = 0;
         for (let i = 0; i < numDice; i++) {
@@ -56,131 +39,163 @@ document.addEventListener('DOMContentLoaded', () => {
             total += roll;
         }
         total += modifier;
-        
         displayResult({ expression, rolls, total });
     };
 
-    /**
-     * Displays the formatted result.
-     */
     const displayResult = (result) => {
-        resultsDiv.innerHTML = ''; // Clear previous results
-
+        resultsDiv.innerHTML = '';
         if (result.error) {
             resultsDiv.innerHTML = `<p class="error">${result.error}</p>`;
             return;
         }
-
         const { expression, rolls, total } = result;
-        
-        const totalEl = document.createElement('p');
-        totalEl.className = 'total';
-        totalEl.textContent = `Total: ${total}`;
-
-        const breakdownEl = document.createElement('p');
-        breakdownEl.className = 'breakdown';
-        breakdownEl.textContent = `${expression} (${rolls.join(', ')})`;
-        
-        resultsDiv.appendChild(totalEl);
-        resultsDiv.appendChild(breakdownEl);
+        resultsDiv.innerHTML = `
+            <p class="total">Total: ${total}</p>
+            <p class="breakdown">${expression} (${rolls.join(', ')})</p>`;
     };
 
     // --- Local Storage and UI Rendering ---
-
-    /**
-     * Saves the current `savedRolls` array to Local Storage.
-     */
     const saveRollsToStorage = () => {
-        localStorage.setItem('diceRoller-savedRolls', JSON.stringify(savedRolls));
+        localStorage.setItem('diceRoller-savedRollsV2', JSON.stringify(savedRolls));
     };
 
-    /**
-     * Renders the list of saved rolls as radio buttons in the UI.
-     */
     const renderCustomRolls = () => {
-        customRollsList.innerHTML = ''; // Clear existing list
-        if (savedRolls.length === 0) {
-            customRollsList.innerHTML = '<p>No custom rolls saved yet.</p>';
-            executeRollButton.disabled = true;
-            return;
-        }
-        
+        customRollsContainer.innerHTML = '';
         savedRolls.forEach((expression, index) => {
-            const id = `custom-roll-${index}`;
-            const item = document.createElement('div');
-            item.className = 'custom-roll-item';
-            item.innerHTML = `
-                <input type="radio" id="${id}" name="custom-roll-selection" value="${expression}">
-                <label for="${id}">${expression}</label>
-                <button class="delete-roll-button" data-index="${index}" aria-label="Delete roll ${expression}">&times;</button>
-            `;
-            customRollsList.appendChild(item);
+            const buttonHtml = `
+                <div class="custom-roll-wrapper">
+                    <button type="button" class="custom-roll-btn" data-index="${index}" contenteditable="false">${expression}</button>
+                    <button class="delete-custom-roll-btn" data-index="${index}" aria-label="Delete roll ${expression}">&times;</button>
+                </div>`;
+            customRollsContainer.insertAdjacentHTML('beforeend', buttonHtml);
         });
-        
-        // Auto-select the first roll in the list if it exists
-        const firstRadio = customRollsList.querySelector('input[type="radio"]');
-        if (firstRadio) {
-            firstRadio.checked = true;
-        }
-        executeRollButton.disabled = false;
+        updateSelectionState();
     };
 
-    // --- Event Handlers ---
-
-    const handleQuickRoll = (event) => {
-        const target = event.target;
-        if (target.matches('.dice-button')) {
-            const sides = parseInt(target.dataset.sides, 10);
-            createRoll({ numDice: 1, numSides: sides, modifier: 0 }, `1d${sides}`);
-        }
-    };
-
-    const handleSaveNewRoll = (event) => {
-        event.preventDefault();
-        const expression = newRollExpressionInput.value.trim();
-        if (!expression) return;
-        
-        if (parseExpression(expression)) {
-            if (!savedRolls.includes(expression)) {
-                savedRolls.push(expression);
-                saveRollsToStorage();
-                renderCustomRolls();
-                newRollExpressionInput.value = ''; // Clear input
+    const updateSelectionState = () => {
+        const buttons = customRollsContainer.querySelectorAll('.custom-roll-btn');
+        let hasSelection = false;
+        buttons.forEach(btn => {
+            const index = parseInt(btn.dataset.index, 10);
+            if (selectedRoll !== null && selectedRoll.index === index) {
+                btn.classList.add('selected');
+                executeRollBtn.disabled = false;
+                executeRollBtn.textContent = `Roll ${selectedRoll.expression}`;
+                hasSelection = true;
             } else {
-                alert('This expression is already saved.');
+                btn.classList.remove('selected');
             }
-        } else {
-            alert('Invalid dice expression format. Use "XdY+Z", e.g., "2d6+3".');
+        });
+
+        if (!hasSelection) {
+            selectedRoll = null;
+            executeRollBtn.disabled = true;
+            executeRollBtn.textContent = 'Select a Roll';
         }
     };
 
-    const handleDeleteRoll = (event) => {
-        if (event.target.matches('.delete-roll-button')) {
-            const indexToDelete = parseInt(event.target.dataset.index, 10);
-            savedRolls.splice(indexToDelete, 1);
+    const finishEditing = (button, index) => {
+        button.contentEditable = 'false';
+        button.classList.remove('editing');
+        const newExpression = button.textContent.trim();
+        
+        if (parseExpression(newExpression)) {
+            savedRolls[index] = newExpression;
             saveRollsToStorage();
-            renderCustomRolls();
+            if(selectedRoll && selectedRoll.index === index) {
+                selectedRoll.expression = newExpression;
+            }
+            updateSelectionState();
+        } else {
+            // Revert to old text if invalid
+            alert(`"${newExpression}" is not a valid roll. Reverting.`);
+            button.textContent = savedRolls[index];
         }
     };
     
-    const handleExecuteRoll = () => {
-        const selectedRadio = customRollsList.querySelector('input[name="custom-roll-selection"]:checked');
-        if (selectedRadio) {
-            const expression = selectedRadio.value;
-            const rollData = parseExpression(expression);
-            if (rollData) {
-                createRoll(rollData, expression);
+    // --- Event Handlers ---
+    addNewRollBtn.addEventListener('click', () => {
+        const newRollExpression = '1d6';
+        savedRolls.push(newRollExpression);
+        saveRollsToStorage();
+        renderCustomRolls();
+
+        const newButtonIndex = savedRolls.length - 1;
+        const newButton = customRollsContainer.querySelector(`.custom-roll-btn[data-index="${newButtonIndex}"]`);
+        
+        // Enter edit mode for the new button immediately
+        newButton.classList.add('editing');
+        newButton.contentEditable = 'true';
+        newButton.focus();
+        document.execCommand('selectAll', false, null); // Select all text
+    });
+
+    customRollsContainer.addEventListener('click', (e) => {
+        // --- Handle Deleting a button ---
+        if (e.target.matches('.delete-custom-roll-btn')) {
+            const indexToDelete = parseInt(e.target.dataset.index, 10);
+            savedRolls.splice(indexToDelete, 1);
+            saveRollsToStorage();
+            // If the deleted roll was the selected one, clear selection
+            if (selectedRoll && selectedRoll.index === indexToDelete) {
+                selectedRoll = null;
             }
-        } else {
-            alert('Please select a roll from your list first.');
+            renderCustomRolls();
+            return;
         }
-    };
+
+        // --- Handle Selecting a button ---
+        if (e.target.matches('.custom-roll-btn')) {
+            const button = e.target;
+            const index = parseInt(button.dataset.index, 10);
+            selectedRoll = { index, expression: savedRolls[index] };
+            updateSelectionState();
+        }
+    });
+
+    // --- Handle Editing a button ---
+    customRollsContainer.addEventListener('dblclick', (e) => {
+        if (e.target.matches('.custom-roll-btn')) {
+            const button = e.target;
+            button.classList.add('editing');
+            button.contentEditable = 'true';
+            button.focus();
+        }
+    });
+
+    customRollsContainer.addEventListener('keydown', (e) => {
+        if (e.target.matches('.custom-roll-btn') && e.key === 'Enter') {
+            e.preventDefault(); // Prevent new line in contentEditable
+            const button = e.target;
+            const index = parseInt(button.dataset.index, 10);
+            finishEditing(button, index);
+        }
+    });
+
+    customRollsContainer.addEventListener('blur', (e) => {
+        if (e.target.matches('.custom-roll-btn') && e.target.isContentEditable) {
+            const button = e.target;
+            const index = parseInt(button.dataset.index, 10);
+            finishEditing(button, index);
+        }
+    }, true); // Use capture phase to catch blur event reliably
+
+    executeRollBtn.addEventListener('click', () => {
+        if (selectedRoll) {
+            const rollData = parseExpression(selectedRoll.expression);
+            if(rollData) {
+                createRoll(rollData, selectedRoll.expression);
+            }
+        }
+    });
+    
+    quickRollsContainer.addEventListener('click', (e) => {
+        if (e.target.matches('.dice-button')) {
+            const sides = parseInt(e.target.dataset.sides, 10);
+            createRoll({ numDice: 1, numSides: sides, modifier: 0 }, `1d${sides}`);
+        }
+    });
 
     // --- Initial Setup ---
-    quickRollsContainer.addEventListener('click', handleQuickRoll);
-    newRollCreatorForm.addEventListener('submit', handleSaveNewRoll);
-    customRollsList.addEventListener('click', handleDeleteRoll);
-    executeRollButton.addEventListener('click', handleExecuteRoll);
-
-    renderCustomRolls(); // Initial render on page load
+    renderCustomRolls();
 });

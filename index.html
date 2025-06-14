@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Dice Roller</title>
+    <title>Dynamic Dice Roller</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
     <header>
-        <h1>Advanced Dice Roller</h1>
+        <h1>Dynamic Dice Roller</h1>
     </header>
     <main>
         <div class="roller-container">
@@ -28,21 +28,21 @@
 
             <fieldset class="control-group">
                 <legend>My Rolls</legend>
-                <form id="newRollCreatorForm" class="new-roll-form">
-                    <label for="newRollExpression" class="sr-only">New Roll Expression (e.g., 2d6+3)</label>
-                    <input type="text" id="newRollExpression" placeholder="e.g., 3d8+5 or 2d12-1" required>
-                    <button type="submit">Save New Roll</button>
-                </form>
-                <div id="customRollsList" class="custom-rolls-list" role="radiogroup" aria-labelledby="custom-rolls-label">
+                <div class="my-rolls-controls">
+                    <button type="button" id="addNewRollBtn" class="add-button">Add New Roll</button>
+                </div>
+                <div id="customRollsContainer" class="custom-rolls-container">
                     </div>
-                <button id="executeRollButton" class="roll-button-large">Roll Selected</button>
             </fieldset>
         </div>
-
-        <div class="results-container" aria-live="polite">
-            <h2>Result</h2>
-            <div id="results" class="results-output">
-                <p>Select a roll and click "Roll Selected".</p>
+        
+        <div class="action-results-container">
+            <button id="executeRollBtn" class="roll-button-large" disabled>Select a Roll</button>
+            <div class="results-container" aria-live="polite">
+                <h2 class="sr-only">Result</h2>
+                <div id="results" class="results-output">
+                    <p>Results will appear here.</p>
+                </div>
             </div>
         </div>
     </main>
