@@ -1,8 +1,105 @@
-/* (Keep all previous CSS from the last step) */
-/* ... */
+/* (Keep all previous CSS Reset and base body styles) */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-/* --- ADDED AND MODIFIED STYLES FOR THIS VERSION --- */
+:root {
+    /* --- NEW Grayscale Palette --- */
+    --bg-color: #f8f9fa;              /* Very light gray for the page background */
+    --surface-color: #ffffff;         /* White for cards and control groups */
+    --border-color: #dee2e6;          /* Light gray for borders */
+    --text-color: #212529;            /* Very dark gray (almost black) for text */
+    --text-muted-color: #6c757d;      /* Medium gray for secondary text */
 
+    /* Accent & Action Colors (Grayscale) */
+    --primary-color: #495057;         /* Medium-dark gray for primary actions/selections */
+    --primary-hover-color: #343a40;   /* Darker gray for hover states */
+    --add-color: #6c757d;              /* A distinct medium gray for the "Add" button */
+    --add-hover-color: #495057;        /* A darker gray for add hover */
+    --delete-hover-color: #212529;     /* Very dark gray for delete hover (replaces red) */
+    --editing-color: #007bff;          /* Using the original blue as a temporary edit indicator for clarity, can be changed */
+    --editing-bg-color: #e7f1ff;       /* Light blue background for editing */
+
+
+    /* --- Standard Variables --- */
+    --font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --border-radius: 6px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header, footer {
+    text-align: center;
+    padding: 1rem;
+    color: var(--text-muted-color);
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.control-group {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.control-group legend {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 0 0.5rem;
+    margin-left: 1rem;
+}
+
+/* --- Quick Rolls & Custom Rolls Buttons --- */
+.quick-rolls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: 0.75rem;
+}
+
+.dice-button {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #e9ecef;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.dice-button:hover {
+    border-color: var(--primary-color);
+    background-color: #dde2e6;
+}
+
+/* --- My Rolls Section --- */
 .my-rolls-controls {
     display: flex;
     justify-content: center;
@@ -14,16 +111,16 @@
     font-size: 1rem;
     font-weight: 600;
     padding: 0.75rem 1.5rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--add-color);
     border-radius: var(--border-radius);
-    background-color: #28a745; /* Green for "Add" */
+    background-color: var(--add-color); /* Uses new gray variable */
     color: white;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .add-button:hover {
-    background-color: #218838;
+    background-color: var(--add-hover-color); /* Uses new gray variable */
 }
 
 .custom-rolls-container {
@@ -38,7 +135,7 @@
 
 .custom-roll-btn {
     width: 100%;
-    padding: 1rem 2rem 1rem 1rem; /* Extra padding on right for delete button */
+    padding: 1rem 2rem 1rem 1rem;
     font-family: inherit;
     font-size: 1.1rem;
     font-weight: 500;
@@ -46,24 +143,25 @@
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
     background-color: var(--surface-color);
+    color: var(--text-color);
     cursor: pointer;
     transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
 .custom-roll-btn.selected {
     border-color: var(--primary-color);
-    background-color: #e7f1ff;
+    background-color: #e9ecef; /* Light gray for selected background */
     box-shadow: 0 0 0 2px var(--primary-color);
 }
 
 .custom-roll-btn.editing {
-    border-color: #ffc107; /* Yellow to indicate editing */
-    background-color: #fff3cd;
+    border-color: var(--editing-color); /* Changed from yellow */
+    background-color: var(--editing-bg-color); /* Changed from yellow */
     cursor: text;
 }
 
 .custom-roll-btn:focus-visible {
-    outline: 3px solid var(--primary-hover);
+    outline: 3px solid var(--primary-hover-color);
     outline-offset: 2px;
 }
 
@@ -74,7 +172,7 @@
     width: 24px;
     height: 24px;
     padding: 0;
-    background: #6c757d;
+    background: var(--text-muted-color);
     color: white;
     border: none;
     border-radius: 50%;
@@ -91,16 +189,15 @@
 }
 
 .delete-custom-roll-btn:hover {
-    background-color: #dc3545; /* Red for delete action */
+    background-color: var(--delete-hover-color); /* Uses new gray variable (was red) */
 }
 
-/* --- MAIN ACTION AREA --- */
-
+/* --- Main Action Area --- */
 .action-results-container {
     width: 100%;
     max-width: 700px;
     margin: 0 auto;
-    padding: 0 1rem; /* Align with main content padding */
+    padding: 0 1rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -119,8 +216,13 @@
     transition: background-color 0.2s, opacity 0.2s;
 }
 
+.roll-button-large:hover,
+.roll-button-large:focus-visible {
+    background-color: var(--primary-hover-color);
+}
+
 .roll-button-large:disabled {
-    background-color: #6c757d;
+    background-color: var(--text-muted-color);
     cursor: not-allowed;
     opacity: 0.7;
 }
@@ -132,7 +234,11 @@
     border-radius: var(--border-radius);
     padding: 1.5rem;
     box-shadow: var(--shadow);
-    min-height: 100px; /* Give it some initial size */
+    min-height: 100px;
+}
+
+.results-output .breakdown {
+    color: var(--text-muted-color);
 }
 
 .sr-only {
