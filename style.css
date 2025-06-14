@@ -1,163 +1,133 @@
-/* Modern CSS Reset */
-*, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
+/* (Keep all previous CSS from the last step) */
+/* ... */
+
+/* ADDED AND MODIFIED STYLES FOR THIS VERSION */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
     padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }
 
-:root {
-    --bg-color: #f8f9fa;
-    --text-color: #212529;
-    --primary-color: #007bff;
-    --primary-hover: #0056b3;
-    --border-color: #dee2e6;
-    --surface-color: #ffffff;
-    --font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --border-radius: 6px;
-    --shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-body {
-    font-family: var(--font-family);
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    line-height: 1.6;
+.new-roll-form {
     display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
 }
 
-header, footer {
-    text-align: center;
-    padding: 1rem;
-    color: #6c757d;
-}
-
-main {
+.new-roll-form input[type="text"] {
     flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    padding: 1rem;
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.roller-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.control-group {
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
-}
-
-.control-group legend {
-    font-size: 1.2rem;
-    font-weight: 600;
-    padding: 0 0.5rem;
-    margin-left: 1rem;
-}
-
-.quick-rolls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-    gap: 0.75rem;
-}
-
-.dice-button, .roll-button {
+    padding: 0.75rem;
     font-family: inherit;
     font-size: 1rem;
-    font-weight: bold;
-    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.new-roll-form button {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     background-color: #e9ecef;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
+    white-space: nowrap;
 }
 
-.dice-button:hover, .roll-button:hover {
+.new-roll-form button:hover {
     border-color: var(--primary-color);
     background-color: #dde2e6;
 }
 
-.custom-roll-form {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.form-row {
+.custom-rolls-list {
     display: flex;
     flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
 }
 
-.form-row label {
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
-    color: #495057;
+.custom-roll-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.form-row input[type="number"] {
-    width: 80px;
-    padding: 0.5rem;
-    font-family: inherit;
-    font-size: 1rem;
-    border: 1px solid var(--border-color);
+.custom-roll-item input[type="radio"] {
+    /* Hide the default radio button */
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.custom-roll-item label {
+    flex-grow: 1;
+    display: block;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
+    background-color: var(--surface-color);
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
 }
 
-.form-separator {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 1.25rem;
+/* Style for the label when its associated radio is checked */
+.custom-roll-item input[type="radio"]:checked + label {
+    border-color: var(--primary-color);
+    background-color: #e7f1ff;
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.custom-roll-item input[type="radio"]:focus-visible + label {
+    outline: 3px solid var(--primary-hover);
+    outline-offset: 2px;
+}
+
+.delete-roll-button {
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
     color: #6c757d;
+    font-size: 1.5rem;
+    line-height: 1;
 }
 
-.roll-button {
+.delete-roll-button:hover {
+    color: #dc3545; /* Red for delete action */
+}
+
+.roll-button-large {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
     background-color: var(--primary-color);
     color: white;
-    border-color: var(--primary-color);
-    margin-top: 1.25rem; /* Aligns with inputs */
-}
-
-.roll-button:hover {
-    background-color: var(--primary-hover);
-    border-color: var(--primary-hover);
-}
-
-.results-container {
-    width: 100%;
-    background-color: var(--surface-color);
-    border: 1px solid var(--border-color);
+    border: none;
     border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.results-output {
-    margin-top: 1rem;
-    font-size: 1.1rem;
-    word-break: break-all;
+.roll-button-large:hover,
+.roll-button-large:focus-visible {
+    background-color: var(--primary-hover);
 }
 
-.results-output .total {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-top: 0.5rem;
-}
-
-.results-output .breakdown {
-    font-size: 0.9rem;
-    color: #6c757d;
+.roll-button-large:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
 }
